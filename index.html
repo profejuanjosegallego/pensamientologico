@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El Problema Real</title>
+<meta name="description" content="Reto para aprender a identificar el problema real antes de proponer una solución. Por Mg. Juan José Gallego.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0B1026">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#0B1026; --card:#18204A; --card2:#212B5E; --ink:#F4F1FF; --muted:#B4B8D9;
+  --ki:#FF8A00; --ki2:#FFD23F; --aura:rgba(255,170,0,.35); --line:#2E3A78;
+  --ok:#3DDC84; --ok-bg:rgba(61,220,132,.14); --bad:#FF5A5F; --bad-bg:rgba(255,90,95,.14);
+  --med:#3FA9F5;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);font:17px/1.55 "Nunito",system-ui,sans-serif;
+  background:radial-gradient(1200px 600px at 80% -10%,#2A1E5C 0%,transparent 60%),radial-gradient(900px 500px at -10% 30%,#1D2A6B 0%,transparent 60%),var(--sky);
+  background-attachment:fixed;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.55;z-index:0;
+  background-image:radial-gradient(1.5px 1.5px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 120px 80px,#fff,transparent),radial-gradient(1.5px 1.5px at 200px 160px,#ffe9a8,transparent),radial-gradient(1px 1px at 300px 40px,#fff,transparent),radial-gradient(1px 1px at 380px 200px,#fff,transparent);
+  background-size:420px 240px}
+main,header,footer,section,.bar{position:relative;z-index:1}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+h1,h2{font-family:"Bangers","Nunito",sans-serif;letter-spacing:.04em;font-weight:400}
+
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;padding:48px 16px 24px}
+.kicker{display:inline-block;background:var(--ki);color:#1a0f00;font-weight:800;border-radius:999px;padding:4px 14px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:clamp(44px,7vw,76px);line-height:.95;margin:14px 0;
+  background:linear-gradient(180deg,var(--ki2),var(--ki));-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 4px 0 #6b2b00)}
+.lead{font-size:19px;color:var(--muted);margin:0}
+.author{margin-top:18px;font-weight:800}
+.author span{color:var(--ki2)}
+
+.stage{position:relative;aspect-ratio:1/1;max-width:420px;width:100%;justify-self:center}
+.aura{position:absolute;inset:8%;border-radius:50%;background:radial-gradient(circle,var(--aura) 0%,transparent 65%);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.08);opacity:.7}}
+
+
+/* radar original */
+.radar{position:relative;width:100%;aspect-ratio:1/1;border-radius:50%;padding:7%;
+  background:linear-gradient(145deg,#FAFAFD,#A9AEC2 60%,#7C8299);box-shadow:0 14px 40px rgba(0,0,0,.55),inset 0 -8px 14px rgba(0,0,0,.25),inset 0 6px 10px rgba(255,255,255,.8)}
+.radar::before{content:"";position:absolute;top:-5%;left:50%;width:16%;height:9%;transform:translateX(-50%);border-radius:8px 8px 3px 3px;
+  background:linear-gradient(#F2F2F7,#8F95AA);box-shadow:0 3px 6px rgba(0,0,0,.35)}
+.screen{position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;border:4px solid #4C5268;
+  background:linear-gradient(rgba(190,255,210,.30) 1px,transparent 1px) center/12.5% 12.5%,linear-gradient(90deg,rgba(190,255,210,.30) 1px,transparent 1px) center/12.5% 12.5%,radial-gradient(circle,#2BB565 0%,#178A47 55%,#0A4B26 100%);
+  box-shadow:inset 0 0 40px rgba(0,0,0,.55)}
+.ring{position:absolute;border:1px solid rgba(210,255,225,.45);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%)}
+.sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(210,255,225,.55),rgba(210,255,225,0) 22%,transparent);animation:spin 3.2s linear infinite}
+.me{position:absolute;left:50%;top:50%;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:15px solid #FF3B3B;transform:translate(-50%,-60%);filter:drop-shadow(0 0 4px #ff3b3b)}
+.blip{position:absolute;width:6%;aspect-ratio:1/1;border-radius:50%;transform:translate(-50%,-50%);background:#FFD23F;box-shadow:0 0 12px 3px rgba(255,210,63,.85);animation:blip 1.3s ease-in-out infinite;transition:opacity .4s}
+.blip.off{opacity:.15;box-shadow:none;animation:none}
+@keyframes blip{50%{transform:translate(-50%,-50%) scale(1.35)}}
+.radar-label{position:absolute;left:50%;bottom:-11%;transform:translateX(-50%);white-space:nowrap;font-family:"Courier New",monospace;font-size:13px;letter-spacing:.12em;color:var(--ok);background:rgba(11,16,38,.85);border:1px solid rgba(61,220,132,.5);border-radius:6px;padding:3px 10px}
+.stage .radar{position:absolute;inset:10%;width:80%}
+.summon .radar{width:min(260px,70%);margin:10px auto 34px;animation:rise 1.2s ease-out both}
+
+.ball{--s:46px;width:var(--s);height:var(--s);border-radius:50%;display:inline-grid;place-items:center;flex:none;
+  background:radial-gradient(circle at 32% 28%,#FFF6D6 0 10%,#FFC24A 30%,#FF8A00 65%,#B85400 100%);
+  box-shadow:0 0 14px rgba(255,170,0,.55),inset -4px -6px 10px rgba(120,50,0,.45);color:#C8102E;font-size:11px;line-height:1;transition:.4s;text-align:center;padding:5px;word-break:break-all;letter-spacing:-.5px;overflow:hidden}
+.ball.off{filter:grayscale(1) brightness(.45);box-shadow:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;position:relative;overflow:hidden}
+.step::after{content:"";position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,var(--aura),transparent 70%)}
+.step b{display:flex;align-items:center;gap:10px;font-size:18px}
+.step p{margin:8px 0 0;color:var(--muted);font-size:15px}
+.step .ball{--s:34px;font-size:14px;font-weight:800;color:#5a1a00}
+
+.bar{position:sticky;top:0;z-index:10;background:rgba(11,16,38,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 0}
+.bar .wrap{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center}
+.scouter{font-family:"Courier New",monospace;background:rgba(61,220,132,.08);border:1px solid rgba(61,220,132,.5);color:var(--ok);border-radius:8px;padding:6px 12px;min-width:170px}
+.scouter small{display:block;font-size:10px;letter-spacing:.15em;opacity:.8}
+.scouter .lvl{font-size:22px;font-weight:700;letter-spacing:.06em}
+.scouter.boom{animation:boom .6s}
+@keyframes boom{30%{transform:scale(1.12);box-shadow:0 0 24px var(--ok)}}
+.kibar{height:14px;border-radius:99px;background:#0a0f26;border:1px solid var(--line);overflow:hidden;position:relative}
+.kibar i{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,#FF5E00,var(--ki),var(--ki2),#fff8d0);box-shadow:0 0 16px var(--ki);transition:width .6s cubic-bezier(.2,1.4,.4,1);overflow:hidden}
+.kibar i::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 10px,rgba(255,255,255,.25) 10px 14px);background-size:28px 100%;animation:flow 1s linear infinite}
+@keyframes flow{to{background-position:28px 0}}
+.kilabel{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);margin-top:4px}
+.balls{display:flex;gap:5px}
+.balls .ball{--s:24px;font-size:6px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 16px;font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ki);color:#1a0f00;border-color:var(--ki)}
+
+section{padding:32px 0}
+h2{font-size:clamp(32px,5vw,44px);margin:0 0 6px;color:var(--ki2)}
+.sub{color:var(--muted);margin:0 0 10px}
+.divider{display:flex;align-items:center;gap:12px;margin:36px 0 18px;color:var(--med);font-family:"Bangers",sans-serif;font-size:30px;letter-spacing:.04em}
+.divider::before,.divider::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,transparent,var(--med),transparent)}
+.q{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:22px;margin:0 0 18px;transition:box-shadow .3s,border-color .3s}
+.q:hover{border-color:rgba(255,170,0,.5);box-shadow:0 0 28px rgba(255,138,0,.15)}
+.q.med:hover{border-color:rgba(63,169,245,.6);box-shadow:0 0 28px rgba(63,169,245,.18)}
+.qhead{display:flex;align-items:center;gap:10px}
+.tag{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:3px 10px;border-radius:999px;background:var(--ki);color:#1a0f00}
+.tag.med{background:var(--med);color:#04182a}
+.qnum{font-family:"Bangers",sans-serif;font-size:22px;color:var(--muted)}
+.q h3{font-size:20px;margin:12px 0 10px;line-height:1.35}
+.clue{background:rgba(255,210,63,.08);border:1px dashed rgba(255,210,63,.55);border-radius:12px;padding:12px 14px;margin:0 0 14px;font-size:16px}
+.q.med .clue{background:rgba(63,169,245,.08);border-color:rgba(63,169,245,.55)}
+.clue strong{color:var(--ki2)} .q.med .clue strong{color:var(--med)}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;background:rgba(255,255,255,.04);border:2px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;font-size:16px;color:var(--ink);cursor:pointer;transition:.2s}
+.opt:hover:not(:disabled){border-color:var(--ki);transform:translateX(3px)}
+.opt .l{flex:none;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--card2);border:1px solid var(--line);font-family:"Bangers",sans-serif;font-size:18px}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--ok-bg);border-color:var(--ok)} .opt.ok .l{background:var(--ok);color:#03200f;border-color:var(--ok)}
+.opt.bad{background:var(--bad-bg);border-color:var(--bad)} .opt.bad .l{background:var(--bad);color:#2a0003;border-color:var(--bad)}
+.fb{display:none;margin-top:16px;border-top:1px dashed var(--line);padding-top:16px}
+.fb.show{display:block;animation:in .4s}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.verdict{font-family:"Bangers",sans-serif;font-size:26px;letter-spacing:.04em}
+.verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+.model{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:12px 0 0}
+.model div{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px}
+.model b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ki2);margin-bottom:2px}
+
+.summon{display:none;text-align:center;border-radius:20px;padding:30px 20px;margin-top:10px;border:1px solid var(--line);
+  background:radial-gradient(circle at 50% 30%,rgba(61,220,132,.18),transparent 60%),var(--card)}
+.summon.show{display:block;animation:in .6s}
+.summon svg{width:min(300px,80%);height:auto;animation:rise 1.4s ease-out both}
+@keyframes rise{from{transform:translateY(60px) scale(.6);opacity:0}}
+.big{font-family:"Bangers",sans-serif;font-size:56px;color:var(--ki2);line-height:1}
+.btn{background:var(--ki);color:#1a0f00;border:0;border-radius:999px;padding:12px 22px;font:inherit;font-weight:800;cursor:pointer;margin-top:10px}
+
+.tpl{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+.tpl label{font-weight:800;display:block}
+.tpl textarea{width:100%;min-height:64px;margin:6px 0 16px;background:rgba(255,255,255,.04);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;resize:vertical}
+.tpl textarea:focus{outline:2px solid var(--ki);border-color:transparent}
+
+footer{color:var(--muted);font-size:14px;padding:32px 16px 48px;text-align:center}
+footer strong{color:var(--ink)}
+.legal{font-size:12px;opacity:.75;max-width:640px;margin:8px auto 0}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr;padding-top:32px}
+  .stage{max-width:300px}
+  .bar .wrap{grid-template-columns:1fr auto}
+  .bar .meter{grid-column:1/-1;order:3}
+  .scouter{min-width:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+
+<header class="wrap hero">
+  <div>
+    <span class="kicker">Entrenamiento de pensamiento</span>
+    <h1>¿Estás resolviendo el problema real?</h1>
+    <p class="lead">Muchas veces corremos a resolver lo que nos pidieron y no lo que está pasando: más entrenamiento, un radar nuevo, más trenes. Aquí vas a entrenar el ojo para ver la causa antes de lanzar la solución.</p>
+    <p class="author">Por <span>Mg. Juan José Gallego</span></p>
+  </div>
+  <div class="stage" aria-hidden="true">
+    <div class="aura"></div>
+    <div class="radar" id="heroRadar"></div>
+  </div>
+</header>
+
+<section class="wrap" style="padding-top:8px">
+  <div class="steps">
+    <div class="step"><b><span class="ball">1</span>¿Qué me pidieron?</b><p>La solución que alguien ya trae decidida. Anótala, pero no la compres todavía.</p></div>
+    <div class="step"><b><span class="ball">2</span>¿Qué está pasando?</b><p>Busca el dato: cuándo pasa, dónde, a quién, y cuándo no pasa.</p></div>
+    <div class="step"><b><span class="ball">3</span>¿Cuál es la causa?</b><p>La que explica el dato. Si la solución pedida no la toca, es el problema que no es.</p></div>
+    <div class="step"><b><span class="ball">4</span>¿Cómo sabré que se resolvió?</b><p>Una señal medible. Sin ella, cualquier cosa parece solución.</p></div>
+  </div>
+</section>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="scouter" id="scouter"><small>NIVEL DE PODER</small><span class="lvl" id="lvl">000000</span></div>
+    <div class="meter">
+      <div class="kibar"><i id="ki"></i></div>
+      <div class="kilabel"><span id="score">0 correctas</span><span id="count">0 / 15 respondidas</span></div>
+    </div>
+    <div class="balls" id="balls" aria-label="Esferas reunidas"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section>
+    <h2>Encuentra el problema real</h2>
+    <p class="sub">En cada caso alguien ya propuso una solución. Lee la pista y elige cuál es el problema de verdad. Desconfía de la respuesta obvia: casi siempre es la que pidieron. Cada acierto sube tu nivel de poder y te acerca a las siete esferas.</p>
+    <div class="filters" role="group" aria-label="Filtrar retos">
+      <button class="chip" data-f="all" aria-pressed="true">Todos</button>
+      <button class="chip" data-f="dbz" aria-pressed="false">Guerreros Z</button>
+      <button class="chip" data-f="med" aria-pressed="false">Medellín</button>
+    </div>
+    <div id="quiz" style="margin-top:18px"></div>
+
+    <div class="summon" id="summon">
+      <div class="radar" id="endRadar" aria-hidden="true"></div>
+      <div class="big" id="final"></div>
+      <p id="finalMsg" style="font-size:19px;max-width:560px;margin:10px auto"></p>
+      <button class="btn" id="reset">Entrenar otra vez</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ahora el tuyo</h2>
+    <p class="sub">Piensa en un problema de tu trabajo, tu barrio o tu casa donde alguien ya propuso una solución. Llena las cuatro casillas. Si no puedes llenar la segunda, todavía no sabes qué está pasando.</p>
+    <div class="tpl">
+      <label for="t1">1. ¿Qué solución me pidieron?</label><textarea id="t1" placeholder="Ej: comprar más máquinas porque no cumplimos las entregas"></textarea>
+      <label for="t2">2. ¿Qué está pasando? ¿Qué dato lo muestra?</label><textarea id="t2" placeholder="Ej: 8 de cada 10 entregas atrasadas estuvieron esperando material del proveedor"></textarea>
+      <label for="t3">3. ¿Cuál es la causa real?</label><textarea id="t3" placeholder="Ej: el proveedor entrega tarde; más máquinas no lo cambian"></textarea>
+      <label for="t4">4. ¿Cómo sabré que se resolvió?</label><textarea id="t4" placeholder="Ej: las entregas a tiempo pasan de 60 % a 90 %"></textarea>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <strong>Mg. Juan José Gallego</strong> · Taller: encontrar el problema real
+  <p class="legal">Material educativo sin fines de lucro. Las referencias a Dragon Ball son de fan y con fines pedagógicos; la obra y sus personajes pertenecen a sus respectivos titulares. El radar y todas las ilustraciones de esta página son originales y no usan imágenes oficiales. Los casos de Medellín son situaciones de ejemplo para practicar.</p>
+</footer>
+
+<script>
+const Q = [
+ {t:"dbz", q:"Krilin muere una y otra vez y sus amigos lo reviven con las esferas. Bulma propone construir un radar más rápido para encontrarlas antes. ¿Cuál es el problema real?",
+  ctx:"Cada vez que muere, Krilin se metió en una pelea contra alguien mucho más fuerte que él.",
+  o:["El radar actual es muy lento","Hay pocas esferas para tantos deseos","Krilin se mete en peleas que no puede ganar; revivirlo más rápido no evita que vuelva a morir","Bulma debería ir a buscar las esferas en persona"], a:2,
+  why:"El radar más rápido mejora la solución de emergencia, no el problema. Es como comprar un mejor extintor en lugar de revisar por qué se prende el fuego.",
+  m:{p:"Un radar más rápido",e:"Siempre muere contra rivales más fuertes",pr:"Las peleas que escoge Krilin",s:"¿Por qué tenemos que revivirlo?"}},
+
+ {t:"dbz", q:"Vegeta entrena el doble de horas que Goku y aun así no lo supera. Concluye que tiene que entrenar el triple. ¿Cuál es el problema real?",
+  ctx:"Goku entrena con un maestro que corrige su técnica. Vegeta entrena solo y repite la misma rutina hace meses.",
+  o:["Le faltan horas de entrenamiento","Necesita una cámara de gravedad más fuerte","No es la cantidad sino el método: más de lo mismo da más de lo mismo","Goku tiene más talento y no hay nada que hacer"], a:2,
+  why:"Duplicar las horas no funcionó, y triplicarlas repite el mismo error. Cuando más esfuerzo no da resultado, hay que cambiar la pregunta.",
+  m:{p:"Entrenar el triple",e:"El doble de horas no funcionó; Goku tiene quien lo corrija",pr:"El método de entrenamiento",s:"¿Qué hace diferente el que sí mejora?"}},
+
+ {t:"dbz", q:"El scouter de Raditz explota cada vez que mide a un rival muy fuerte. Pide uno más resistente. ¿Cuál es el problema real?",
+  ctx:"Raditz lo usa para decidir si pelea o huye. Y ya perdió una pelea contra alguien que el scouter marcó como débil, porque el rival escondía su poder.",
+  o:["El scouter necesita un material más resistente","Necesita un scouter con más alcance","Su problema es decidir si pelea, y el scouter ni siquiera mide bien a quien oculta su poder","Debería medir a los rivales desde más lejos"], a:2,
+  why:"Arreglar la herramienta no sirve si la herramienta no responde la pregunta. La pregunta real es “¿puedo ganar?”, y el scouter da datos engañosos.",
+  m:{p:"Un scouter más resistente",e:"Perdió contra alguien que el scouter marcó como débil",pr:"Decidir bien cuándo pelear",s:"¿Para qué uso realmente esta herramienta?"}},
+
+ {t:"dbz", q:"La casa del Maestro Roshi queda destruida después de cada pelea. Bulma propone reconstruirla con materiales más resistentes. ¿Cuál es el problema real?",
+  ctx:"Los villanos siempre llegan ahí porque es el lugar donde todos se reúnen, y ya todo el mundo sabe dónde queda.",
+  o:["Los materiales de la casa son débiles","Hay que reconstruir más rápido usando cápsulas","Todos se concentran en un lugar que los enemigos ya conocen","El Maestro Roshi necesita vigilancia"], a:2,
+  why:"Muros más fuertes solo cambian cuánto tarda en caerse. Mientras la casa sea el punto de encuentro conocido, las peleas van a seguir llegando ahí.",
+  m:{p:"Materiales más resistentes",e:"Los villanos llegan porque saben dónde se reúnen",pr:"Un punto de encuentro que todos conocen",s:"¿Por qué las peleas siempre pasan aquí?"}},
+
+ {t:"dbz", q:"Gohan bajó sus notas y su mamá propone contratarle más tutores. ¿Cuál es el problema real?",
+  ctx:"Los profesores cuentan que se duerme en clase. En las noches entrena a escondidas hasta la madrugada.",
+  o:["Le faltan tutores","Debería cambiar de colegio","No duerme: entrena de noche y llega agotado","Las materias son muy difíciles para él"], a:2,
+  why:"Más tutores le quitan todavía más horas de sueño. Que se duerma en clase dice que el problema no es entender, sino llegar despierto.",
+  m:{p:"Más tutores",e:"Se duerme en clase; entrena de madrugada",pr:"Falta de sueño",s:"¿Qué cambió en su rutina?"}},
+
+ {t:"dbz", q:"Las semillas del ermitaño se acaban antes de cada batalla grande. Proponen pedirle a Karin que cultive el doble. ¿Cuál es el problema real?",
+  ctx:"Al revisar, la mitad de las semillas se usaron en golpes leves de entrenamiento que habrían sanado solos en un día.",
+  o:["Karin cultiva muy pocas","Hay que buscar otro lugar donde cultivarlas","No hay un criterio de uso: se gastan en heridas que no las necesitan","Hay que darle solo una a cada guerrero"], a:2,
+  why:"Duplicar la producción alimenta el mismo desperdicio, y racionar “una por persona” es arbitrario. El dato muestra que falta una regla de cuándo se usan.",
+  m:{p:"Cultivar el doble",e:"La mitad se gastó en heridas leves",pr:"Falta de un criterio de uso",s:"¿En qué se están gastando?"}},
+
+ {t:"dbz", q:"Yamcha pierde casi todas sus peleas y cree que necesita una técnica nueva y más poderosa. ¿Cuál es el problema real?",
+  ctx:"Al ver los videos de sus peleas, casi siempre pierde en el primer minuto porque se lanza de frente sin observar al rival.",
+  o:["Le falta una técnica más poderosa","Le falta fuerza física","Su forma de empezar las peleas: ataca sin leer al rival","Los árbitros lo perjudican"], a:2,
+  why:"Una técnica nueva no sirve si pierde antes de usarla. El dato de cuándo pierde, en el primer minuto, señala el punto exacto que hay que corregir.",
+  m:{p:"Una técnica nueva",e:"Pierde casi siempre en el primer minuto",pr:"La estrategia de inicio",s:"¿En qué momento exacto pierde?"}},
+
+ {t:"dbz", q:"Cuando llegan al lugar que marca el radar, las esferas ya no están. Bulma quiere construir un radar más preciso. ¿Cuál es el problema real?",
+  ctx:"El radar funcionó perfecto durante años. Empezó a “fallar” justo cuando apareció un ejército que también anda buscando esferas.",
+  o:["El radar perdió precisión","El mapa del radar está desactualizado","Alguien más las está recogiendo antes que ellos","Su nave es muy lenta"], a:2,
+  why:"Si la herramienta funcionó años y el cambio coincide con un nuevo competidor, probablemente la herramienta no es el problema. Pregunta qué cambió justo cuando empezó a fallar.",
+  m:{p:"Un radar más preciso",e:"Empezó a fallar cuando apareció otro buscador",pr:"Competencia por las esferas",s:"¿Qué cambió justo cuando empezó?"}},
+
+ {t:"dbz", q:"La cámara de gravedad se daña cada semana. Proponen comprar repuestos más caros. ¿Cuál es el problema real?",
+  ctx:"Siempre se daña cuando Vegeta la sube a 500 veces la gravedad. La cámara fue diseñada para un máximo de 300.",
+  o:["Los repuestos son de mala calidad","Hace falta un técnico permanente","Se usa por encima de la capacidad para la que fue diseñada","Vegeta no sabe manejarla"], a:2,
+  why:"Repuestos más caros se van a dañar igual si la cámara se sigue usando muy por encima de su capacidad. O se respeta el límite o se diseña una cámara para 500.",
+  m:{p:"Repuestos más caros",e:"Se daña a 500x; aguanta 300x",pr:"Uso por encima de la capacidad",s:"¿En qué condiciones se daña?"}},
+
+ {t:"dbz", q:"Las filas para inscribirse al Torneo de Artes Marciales duran horas. Proponen construir un estadio más grande. ¿Cuál es el problema real?",
+  ctx:"El estadio nunca se ha llenado. La fila se forma porque un solo monje escribe a mano el nombre de cada peleador.",
+  o:["El estadio es pequeño","Se inscriben demasiados peleadores","El proceso de inscripción: una sola persona escribiendo a mano","Habría que cobrar la inscripción"], a:2,
+  why:"Si el estadio nunca se llena, agrandarlo no toca la fila. La fila está en la inscripción: ahí está el cuello de botella.",
+  m:{p:"Un estadio más grande",e:"El estadio nunca se llena; un monje inscribe a mano",pr:"El proceso de inscripción",s:"¿Dónde exactamente se forma la fila?"}},
+
+ {t:"med", q:"Los vecinos piden más semáforos en una calle de su barrio porque hay muchos accidentes. ¿Cuál es el problema real?",
+  ctx:"Casi todos los accidentes pasan de noche, y ese tramo no tiene alumbrado público.",
+  o:["Faltan semáforos","Los conductores van muy rápido","La falta de iluminación en ese tramo","Falta señalización pintada"], a:2,
+  why:"De día, con la misma calle y los mismos cruces, casi no hay accidentes. Lo que cambia de noche es la visibilidad, y un semáforo no ilumina.",
+  m:{p:"Más semáforos",e:"Casi todos los accidentes son de noche y no hay luz",pr:"Iluminación del tramo",s:"¿Qué cambia entre cuando pasa y cuando no?"}},
+
+ {t:"med", q:"En una estación del metro se forman filas enormes en hora pico. Proponen comprar más trenes. ¿Cuál es el problema real?",
+  ctx:"La fila no está en el andén sino en las taquillas, de gente que va a recargar la tarjeta.",
+  o:["Faltan trenes","Los trenes pasan muy separados","La recarga de la tarjeta: pocas taquillas o pocas formas de recargar","La estación es muy pequeña"], a:2,
+  why:"Más trenes resuelven las filas del andén, no las de la taquilla. Mirar dónde se forma la fila evita gastar en la solución equivocada.",
+  m:{p:"Más trenes",e:"La fila está en la taquilla, no en el andén",pr:"La forma de recargar",s:"¿Dónde está exactamente la fila?"}},
+
+ {t:"med", q:"Un barrio pide un puente peatonal porque la gente cruza por la mitad de la avenida. ¿Cuál es el problema real?",
+  ctx:"Ya existe un puente peatonal a 300 metros, pero la gente no lo usa porque de noche es oscuro y han robado ahí.",
+  o:["Falta un puente peatonal","La gente es imprudente","El puente que ya existe es inseguro, por eso nadie lo usa","La avenida es muy ancha"], a:2,
+  why:"Otro puente puede terminar igual si no se resuelve por qué no usan el que hay. Antes de crear algo nuevo, pregunta por qué no funciona lo existente.",
+  m:{p:"Un puente nuevo",e:"Hay uno a 300 m que nadie usa por inseguro",pr:"La seguridad del puente actual",s:"¿Por qué no usan lo que ya existe?"}},
+
+ {t:"med", q:"Una obra pública lleva dos años detenida. Alguien propone hacer una app para que los ciudadanos reporten cómo va la obra. ¿Cuál es el problema real?",
+  ctx:"Todo el barrio sabe que está detenida. Está frenada porque faltan por comprar algunos predios.",
+  o:["Falta información sobre el estado de la obra","Los ciudadanos no participan","La compra de los predios que tienen frenada la obra","La obra necesita más publicidad"], a:2,
+  why:"La app resuelve un problema de información, y la información ya la tiene todo el mundo. Una solución tecnológica no destraba un problema que no es tecnológico.",
+  m:{p:"Una app de reportes",e:"Todos saben que está detenida; faltan predios",pr:"La compra de predios",s:"¿Qué es lo que realmente bloquea?"}},
+
+ {t:"med", q:"En una vía tapan los huecos cada mes y proponen contratar más cuadrillas para taparlos más rápido. ¿Cuál es el problema real?",
+  ctx:"Los huecos reaparecen siempre en el mismo tramo, justo donde una tubería con fuga humedece el terreno debajo del pavimento.",
+  o:["Faltan cuadrillas de reparación","El asfalto que usan es de mala calidad","La fuga de agua que daña el terreno debajo de la vía","Pasan demasiados carros pesados"], a:2,
+  why:"Tapar más rápido es correr detrás del síntoma. Si el hueco vuelve siempre en el mismo sitio, algo debajo lo está causando.",
+  m:{p:"Más cuadrillas",e:"Reaparecen en el mismo tramo, sobre una fuga",pr:"La tubería con fuga",s:"¿Por qué vuelve siempre en el mismo sitio?"}},
+];
+
+// Baraja las opciones de forma fija para que la respuesta correcta cambie de letra
+Q.forEach((x,i)=>{ let s=i*97+13; const r=()=>(s=(s*9301+49297)%233280)/233280;
+  const idx=[0,1,2,3]; for(let k=3;k>0;k--){const m=Math.floor(r()*(k+1)); [idx[k],idx[m]]=[idx[m],idx[k]];}
+  x.o=idx.map(n=>x.o[n]); x.a=idx.indexOf(x.a); });
+
+const L=["A","B","C","D"], state={}; let filter="all";
+const quiz=document.getElementById("quiz");
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const stars=n=>"★".repeat(n);
+
+const BLIPS=[[30,28],[70,22],[78,58],[58,76],[24,66],[44,40],[64,44]];
+function buildRadar(el){
+  el.innerHTML='<div class="screen"><div class="ring" style="width:33%;height:33%"></div><div class="ring" style="width:66%;height:66%"></div><div class="sweep"></div>'+
+    BLIPS.map(([x,y])=>`<span class="blip off" style="left:${x}%;top:${y}%"></span>`).join("")+'<span class="me"></span></div><div class="radar-label">0 / 7 ESFERAS</div>';
+}
+const radars=[document.getElementById("heroRadar"),document.getElementById("endRadar")];
+radars.forEach(buildRadar);
+function paintRadars(lit){ radars.forEach(r=>{ r.querySelectorAll(".blip").forEach((b,i)=>b.classList.toggle("off",i>=lit)); r.querySelector(".radar-label").textContent=`${lit} / 7 ESFERAS`; }); }
+const ballsEl=document.getElementById("balls");
+for(let i=0;i<7;i++){ const b=document.createElement("span"); b.className="ball off"; b.textContent=stars(i+1); ballsEl.appendChild(b); }
+
+function card(x,i){
+  const d=document.createElement("article"); d.className="q "+x.t;
+  d.innerHTML=`<div class="qhead"><span class="qnum">#${i+1}</span><span class="tag ${x.t}">${x.t==="med"?"Medellín":"Guerreros Z"}</span></div>
+    <h3>${esc(x.q)}</h3>
+    <p class="clue"><strong>Pista:</strong> ${esc(x.ctx)}</p>
+    <div class="opts">${x.o.map((o,j)=>`<button class="opt" data-j="${j}"><span class="l">${L[j]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+    <div class="fb"></div>`;
+  d.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ state[i]=+b.dataset.j; paint(d,x,i); update(true); });
+  if(i in state) paint(d,x,i);
+  return d;
+}
+function render(){
+  quiz.innerHTML=""; let medShown=false;
+  Q.forEach((x,i)=>{
+    if(filter!=="all"&&x.t!==filter) return;
+    if(x.t==="med"&&!medShown){ medShown=true; const h=document.createElement("div"); h.className="divider"; h.textContent="Retos de Medellín"; quiz.appendChild(h); }
+    quiz.appendChild(card(x,i));
+  });
+  update(false);
+}
+function paint(d,x,i){
+  const pick=state[i], ok=pick===x.a;
+  d.querySelectorAll(".opt").forEach(b=>{ const j=+b.dataset.j; b.disabled=true;
+    if(j===x.a) b.classList.add("ok"); else if(j===pick) b.classList.add("bad"); });
+  const fb=d.querySelector(".fb"); fb.classList.add("show");
+  fb.innerHTML=`<div class="verdict ${ok?"ok":"bad"}">${ok?"¡Golpe certero!":"¡Ese era el problema que no es! La respuesta es la "+L[x.a]}</div>
+    <p>${esc(x.why)}</p>
+    <div class="model"><div><b>Lo que pidieron</b>${esc(x.m.p)}</div><div><b>El dato clave</b>${esc(x.m.e)}</div><div><b>Problema real</b>${esc(x.m.pr)}</div><div><b>Pregunta que lo destapa</b>${esc(x.m.s)}</div></div>`;
+}
+let lastLvl=0;
+function update(anim){
+  const ans=Object.keys(state).length, good=Object.entries(state).filter(([i,v])=>Q[i].a===v).length;
+  const lvl=good?Math.round(500*Math.pow(1.9,good)):0;
+  const lv=document.getElementById("lvl");
+  if(anim&&lvl!==lastLvl){
+    const sc=document.getElementById("scouter"); sc.classList.remove("boom"); void sc.offsetWidth; sc.classList.add("boom");
+    const from=lastLvl, t0=performance.now();
+    (function step(t){ const p=Math.min(1,(t-t0)/700); lv.textContent=String(Math.round(from+(lvl-from)*p)).padStart(6,"0"); if(p<1) requestAnimationFrame(step); })(t0);
+  } else lv.textContent=String(lvl).padStart(6,"0");
+  lastLvl=lvl;
+  document.getElementById("ki").style.width=(good/Q.length*100)+"%";
+  document.getElementById("score").textContent=`${good} correctas${lvl>9000?" · ¡más de 9000!":""}`;
+  document.getElementById("count").textContent=`${ans} / ${Q.length} respondidas`;
+  const lit=Math.floor(good*7/Q.length+1e-9);
+  [...ballsEl.children].forEach((b,i)=>b.classList.toggle("off",i>=lit)); paintRadars(lit);
+  const sm=document.getElementById("summon");
+  if(ans===Q.length){
+    sm.classList.add("show");
+    document.getElementById("final").textContent=`${good} / ${Q.length}`;
+    document.getElementById("finalMsg").textContent= lit===7
+      ? "¡El radar encontró las siete esferas! Tu deseo queda concedido: ver siempre el problema real antes de lanzar la solución."
+      : good>=10 ? `Reuniste ${lit} esferas. El radar todavía no las ubica todas: repasa las pistas de los retos que fallaste.`
+      : `Reuniste ${lit} esferas. Sigue entrenando: lee primero la pista y pregúntate qué explica el dato.`;
+  } else sm.classList.remove("show");
+}
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{
+  filter=b.dataset.f; document.querySelectorAll("[data-f]").forEach(c=>c.setAttribute("aria-pressed",c===b)); render();
+});
+document.getElementById("reset").onclick=()=>{ for(const k in state) delete state[k]; lastLvl=0; render(); document.querySelector("main").scrollIntoView({behavior:"smooth"}); };
+render();
+</script>
+</body>
+</html>
